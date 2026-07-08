@@ -95,7 +95,7 @@ export default function BlogForm({ mode, blog }: BlogFormProps) {
         await api.put(`/blogs/${getBlogId(blog)}`, payload, {
           headers: authHeaders(token),
         });
-        router.push(`/blogs/${getBlogId(blog)}`);
+        router.push(`/blogs`);
       } else {
         const response = await api.post<{ data?: Blog }>("/blogs", payload, {
           headers: authHeaders(token),
