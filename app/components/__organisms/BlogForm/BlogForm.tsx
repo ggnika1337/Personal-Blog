@@ -31,8 +31,8 @@ function getErrorMessage(error: unknown) {
 
 export default function BlogForm({ mode, blog }: BlogFormProps) {
   const router = useRouter();
-  const [currentUser, setCurrentUser] = useState<User | null | undefined>(
-    () => (getToken() ? undefined : null),
+  const [currentUser, setCurrentUser] = useState<User | null | undefined>(() =>
+    getToken() ? undefined : null,
   );
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
@@ -100,8 +100,9 @@ export default function BlogForm({ mode, blog }: BlogFormProps) {
         const response = await api.post<{ data?: Blog }>("/blogs", payload, {
           headers: authHeaders(token),
         });
-        const createdId = response.data.data ? getBlogId(response.data.data) : "";
-        router.push(createdId ? `/blogs/${createdId}` : "/");
+        const createdId = response.data.data
+          ? getBlogId(response.data.data)
+          : "";
       }
 
       router.refresh();
