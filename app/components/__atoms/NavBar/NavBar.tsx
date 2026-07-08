@@ -4,6 +4,8 @@ import { Moon, Sun } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { clearToken, getToken } from "../../../lib/auth";
+import Image from "next/image";
+import { api, authHeaders, getMediaUrl, User } from "../../../lib/api";
 
 const links = [
   { label: "Home", href: "/" },
@@ -24,12 +26,25 @@ function getInitialTheme() {
 }
 
 export default function NavBar() {
-  const [isDark, setIsDark] = useState(getInitialTheme);
-  const [hasToken, setHasToken] = useState(() => Boolean(getToken()));
+  const [isDark, setIsDark] = useState(false);
+  const [hasToken, setHasToken] = useState<boolean | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", isDark);
     window.localStorage.setItem("theme", isDark ? "dark" : "light");
+
+    const token = getToken();
+
+    setHasToken(Boolean(token));
+
+    if (!token) return;
+
+    api
+      .get<User>("/auth/current-user", {
+        headers: authHeaders(token),
+      })
+      .then((res) => setUser(res.data));
   }, [isDark]);
 
   function handleSignOut() {
@@ -45,7 +60,17 @@ export default function NavBar() {
         href="/"
         aria-label="Blog home"
       >
-        <span>B</span>
+        {user?.profileAvatar?.imageUrl ? (
+          <Image
+            src={getMediaUrl(user.profileAvatar.imageUrl)}
+            alt="Profile avatar"
+            width={38}
+            height={38}
+            className="size-full object-cover"
+          />
+        ) : (
+          <span>B</span>
+        )}
       </Link>
 
       <nav

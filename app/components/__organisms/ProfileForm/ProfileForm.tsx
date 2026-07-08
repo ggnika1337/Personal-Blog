@@ -9,16 +9,11 @@ import { api, authHeaders, getMediaUrl, User } from "../../../lib/api";
 import { getToken } from "../../../lib/auth";
 
 function getAvatar(user: User | null) {
-  const avatar = user?.profileAvatar ?? user?.avatar;
+  if (!user?.profileAvatar?.imageUrl) return "";
 
-  if (!avatar) return "";
-
-  if (typeof avatar === "object") {
-    return getMediaUrl(avatar.url);
-  }
-
-  return getMediaUrl(avatar);
+  return getMediaUrl(user.profileAvatar.imageUrl);
 }
+
 function getErrorMessage(error: unknown) {
   if (axios.isAxiosError<{ message?: string }>(error)) {
     return error.response?.data?.message ?? "Profile request failed";
@@ -104,13 +99,13 @@ export default function ProfileForm() {
     <section className="grid gap-8">
       <div className="flex items-center gap-4">
         <div className="grid size-20 place-items-center overflow-hidden rounded-[10px] border border-[#dfddd8] bg-white text-lg font-black dark:border-[#34332f] dark:bg-[#20201d]">
-          {getAvatar(user) ? (
+          {user?.profileAvatar?.imageUrl ? (
             <Image
-              alt={user?.fullName ?? "Profile avatar"}
+              src={getMediaUrl(user.profileAvatar.imageUrl)}
+              alt="Profile avatar"
+              width={38}
+              height={38}
               className="size-full object-cover"
-              height={80}
-              src={getAvatar(user)}
-              width={80}
             />
           ) : (
             <span>{user?.fullName?.charAt(0) ?? "U"}</span>
@@ -147,13 +142,6 @@ export default function ProfileForm() {
           label="Birth date"
           name="birthDate"
           type="date"
-        />
-
-        <FormInput
-          defaultValue={user?.email}
-          label="Email"
-          name="email"
-          type="email"
         />
 
         <FormInput

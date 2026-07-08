@@ -8,8 +8,12 @@ export type User = {
   email: string;
   age?: number;
   birthDate?: string;
-  profileAvatar?: string;
-  avatar?: string;
+
+  profileAvatar?: {
+    imageUrl?: string;
+    imagePublicId?: string;
+  };
+
   role?: string;
 };
 
